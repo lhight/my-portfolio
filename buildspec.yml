@@ -1,0 +1,13 @@
+version: 0.1
+
+phases:
+  build:
+    commands:
+      - echo Nothing to do yet
+artificats:
+  files:
+    - index.html
+    - favicon.ico
+    - "Lsrnel Hight Resume(1).pdf"
+    - styles/main.css
+    - images/*
