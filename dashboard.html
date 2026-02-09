@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Security Dashboard | CloudyDays Security</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700|Inter:400,500,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <i class="fa fa-shield"></i>
+      <span>CloudyDays<br><small>Security Console</small></span>
+    </div>
+    <nav class="sidebar__nav">
+      <a href="#" class="sidebar__link sidebar__link--active" data-view="overview">
+        <i class="fa fa-th-large"></i> Overview
+      </a>
+      <a href="#" class="sidebar__link" data-view="clients">
+        <i class="fa fa-building"></i> Clients
+      </a>
+      <a href="#" class="sidebar__link" data-view="assets">
+        <i class="fa fa-server"></i> Assets
+      </a>
+      <a href="#" class="sidebar__link" data-view="vulnerabilities">
+        <i class="fa fa-bug"></i> Vulnerabilities
+      </a>
+      <a href="#" class="sidebar__link" data-view="reports">
+        <i class="fa fa-file-text-o"></i> Reports
+      </a>
+    </nav>
+    <div class="sidebar__footer">
+      <a href="index.html" class="sidebar__link">
+        <i class="fa fa-arrow-left"></i> Back to Portfolio
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="topbar__toggle" id="sidebarToggle">
+        <i class="fa fa-bars"></i>
+      </button>
+      <div class="topbar__search">
+        <i class="fa fa-search"></i>
+        <input type="text" placeholder="Search clients, assets, CVEs..." id="globalSearch">
+      </div>
+      <div class="topbar__actions">
+        <button class="topbar__btn" title="Notifications">
+          <i class="fa fa-bell-o"></i>
+          <span class="topbar__badge">3</span>
+        </button>
+        <div class="topbar__user">
+          <div class="topbar__avatar">LH</div>
+          <span>Larnel H.</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Overview View -->
+    <section class="view view--active" id="view-overview">
+      <div class="view__header">
+        <h1>Security Overview</h1>
+        <p class="view__subtitle">Real-time security posture across all clients</p>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-card__icon kpi-card__icon--blue">
+            <i class="fa fa-building"></i>
+          </div>
+          <div class="kpi-card__content">
+            <span class="kpi-card__value" id="kpi-clients">0</span>
+            <span class="kpi-card__label">Active Clients</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card__icon kpi-card__icon--cyan">
+            <i class="fa fa-server"></i>
+          </div>
+          <div class="kpi-card__content">
+            <span class="kpi-card__value" id="kpi-assets">0</span>
+            <span class="kpi-card__label">Total Assets</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card__icon kpi-card__icon--red">
+            <i class="fa fa-exclamation-triangle"></i>
+          </div>
+          <div class="kpi-card__content">
+            <span class="kpi-card__value" id="kpi-critical">0</span>
+            <span class="kpi-card__label">Critical Vulns</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-card__icon kpi-card__icon--green">
+            <i class="fa fa-check-circle"></i>
+          </div>
+          <div class="kpi-card__content">
+            <span class="kpi-card__value" id="kpi-resolved">0</span>
+            <span class="kpi-card__label">Resolved (30d)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card__header">
+            <h3>Vulnerability Severity Distribution</h3>
+          </div>
+          <div class="card__body">
+            <canvas id="chart-severity"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__header">
+            <h3>Vulnerability Trend (6 Months)</h3>
+          </div>
+          <div class="card__body">
+            <canvas id="chart-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Risk Table -->
+      <div class="card">
+        <div class="card__header">
+          <h3>Client Risk Summary</h3>
+          <div class="card__actions">
+            <select id="riskFilter" class="select-input">
+              <option value="all">All Risk Levels</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="card__body card__body--no-padding">
+          <table class="table" id="clientRiskTable">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Industry</th>
+                <th>Assets</th>
+                <th>Critical</th>
+                <th>High</th>
+                <th>Medium</th>
+                <th>Low</th>
+                <th>Risk Score</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="clientRiskBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card__header">
+          <h3>Recent Activity</h3>
+        </div>
+        <div class="card__body">
+          <div class="activity-feed" id="activityFeed">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Clients View -->
+    <section class="view" id="view-clients">
+      <div class="view__header">
+        <h1>Clients</h1>
+        <button class="btn btn--primary" id="addClientBtn">
+          <i class="fa fa-plus"></i> Add Client
+        </button>
+      </div>
+      <div class="client-cards" id="clientCards">
+      </div>
+    </section>
+
+    <!-- Assets View -->
+    <section class="view" id="view-assets">
+      <div class="view__header">
+        <h1>Asset Inventory</h1>
+        <div class="view__controls">
+          <select id="assetClientFilter" class="select-input">
+            <option value="all">All Clients</option>
+          </select>
+          <select id="assetTypeFilter" class="select-input">
+            <option value="all">All Types</option>
+            <option value="server">Servers</option>
+            <option value="workstation">Workstations</option>
+            <option value="network">Network Devices</option>
+            <option value="cloud">Cloud Resources</option>
+            <option value="application">Applications</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__body">
+          <div class="charts-grid">
+            <canvas id="chart-assetTypes"></canvas>
+            <canvas id="chart-assetsByClient"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__body card__body--no-padding">
+          <table class="table" id="assetTable">
+            <thead>
+              <tr>
+                <th>Asset Name</th>
+                <th>Client</th>
+                <th>Type</th>
+                <th>IP / Identifier</th>
+                <th>OS / Platform</th>
+                <th>Vulnerabilities</th>
+                <th>Last Scanned</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="assetBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vulnerabilities View -->
+    <section class="view" id="view-vulnerabilities">
+      <div class="view__header">
+        <h1>Vulnerabilities</h1>
+        <div class="view__controls">
+          <select id="vulnClientFilter" class="select-input">
+            <option value="all">All Clients</option>
+          </select>
+          <select id="vulnSeverityFilter" class="select-input">
+            <option value="all">All Severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select id="vulnStatusFilter" class="select-input">
+            <option value="all">All Statuses</option>
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__body card__body--no-padding">
+          <table class="table" id="vulnTable">
+            <thead>
+              <tr>
+                <th>CVE ID</th>
+                <th>Title</th>
+                <th>Client</th>
+                <th>Asset</th>
+                <th>Severity</th>
+                <th>CVSS</th>
+                <th>Status</th>
+                <th>Discovered</th>
+              </tr>
+            </thead>
+            <tbody id="vulnBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports View -->
+    <section class="view" id="view-reports">
+      <div class="view__header">
+        <h1>Reports</h1>
+      </div>
+      <div class="reports-grid">
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-pie-chart"></i></div>
+          <h3>Executive Summary</h3>
+          <p>High-level security posture overview for stakeholders</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-bug"></i></div>
+          <h3>Vulnerability Report</h3>
+          <p>Detailed vulnerability findings with remediation steps</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-server"></i></div>
+          <h3>Asset Inventory</h3>
+          <p>Complete asset catalog with configuration details</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-line-chart"></i></div>
+          <h3>Trend Analysis</h3>
+          <p>Month-over-month security posture comparison</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-check-square-o"></i></div>
+          <h3>Compliance Status</h3>
+          <p>Compliance framework mapping and gap analysis</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+        <div class="report-card">
+          <div class="report-card__icon"><i class="fa fa-clock-o"></i></div>
+          <h3>SLA Performance</h3>
+          <p>Remediation timeline tracking and SLA adherence</p>
+          <button class="btn btn--outline">Generate Report</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Client Detail Modal -->
+    <div class="modal" id="clientDetailModal">
+      <div class="modal__overlay"></div>
+      <div class="modal__content">
+        <div class="modal__header">
+          <h2 id="modalClientName">Client Name</h2>
+          <button class="modal__close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal__body" id="modalBody">
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="scripts/dashboard.js"></script>
+</body>
+</html>
